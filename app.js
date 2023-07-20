@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+var encrypt = require("mongoose-encryption");
 const app = express();
 app.set("view engine", "ejs");
 app.use(
@@ -16,6 +17,8 @@ const UserSchema = new mongoose.Schema({
   email: "String",
   password: "String",
 });
+var secret = "This is a secrect message";
+UserSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
 const User = mongoose.model("user", UserSchema);
 
 app.get("/home", function (req, res) {
@@ -36,13 +39,12 @@ app.post("/register", function (req, res) {
   user
     .save()
     .then(() => {
-      res.redirect("register");
+      res.render("secrets");
     })
     .catch((err) => {
       console.log(err);
     });
 });
-
 app.get("/login", function (req, res) {
   res.render("login");
 });
